@@ -1,7 +1,7 @@
 name: caption_trans
 description: "Video subtitle extraction and translation app using Whisper and LLM."
 publish_to: 'none'
-version: 1.1.3+1
+version: 1.1.4+2
 
 environment:
   sdk: ^3.10.8
@@ -47,8 +47,8 @@ dependencies:
   uuid: ^4.5.3
 
 ffmpeg_kit_extended_config:
-  linux: "https://github.com/akashskypatel/ffmpeg-kit-builders/releases/download/v0.8.2-linux/bundle-base-linux-x86_64-shared-small-gpl.zip"
-  windows: "https://github.com/akashskypatel/ffmpeg-kit-builders/releases/download/v0.8.2-windows/bundle-base-windows-x86_64-shared-small-gpl.zip"
+  linux: "https://github.com/akashskypatel/ffmpeg-kit-builders/releases/download/v0.11.1-linux/bundle-base-linux-x86_64-shared-small-gpl.zip"
+  windows: "https://github.com/akashskypatel/ffmpeg-kit-builders/releases/download/v0.11.1-windows/bundle-base-windows-x86_64-shared-small-gpl.zip"
   
 dev_dependencies:
   flutter_test:
