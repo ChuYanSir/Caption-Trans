@@ -149,7 +149,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportedFormats.
   ///
   /// In en, this message translates to:
-  /// **'Supports MP4, MKV, AVI, MOV, WebM and more'**
+  /// **'Supports MP4, MKV, AVI, MOV, WebM, M3U8 (HLS) and more'**
   String get supportedFormats;
 
   /// No description provided for @videoSelected.
@@ -739,6 +739,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Release notes'**
   String get releaseNotes;
+
+  /// No description provided for @errorDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Error details'**
+  String get errorDetails;
+
+  /// No description provided for @recentLogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent logs'**
+  String get recentLogs;
+
+  /// No description provided for @copy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get copy;
+
+  /// No description provided for @copiedToClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied to clipboard'**
+  String get copiedToClipboard;
+
+  /// No description provided for @cliPathLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CLI command / path'**
+  String get cliPathLabel;
+
+  /// No description provided for @cliPathHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. claude or C:\\path\\to\\claude.cmd'**
+  String get cliPathHint;
+
+  /// No description provided for @apiKeyOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'API key (optional)'**
+  String get apiKeyOptional;
 }
 
 class _AppLocalizationsDelegate

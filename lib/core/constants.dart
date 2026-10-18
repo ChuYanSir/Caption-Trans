@@ -63,6 +63,9 @@ class AppConstants {
 
   static const String defaultWhisperModel = 'large-v3-turbo';
 
+  /// Display name of the local Claude Code CLI translation provider.
+  static const String claudeCodeCliProvider = 'Claude Code (本地 CLI)';
+
   /// Supported languages for translation target.
   static const Map<String, String> supportedLanguages = {
     'zh': '中文',
@@ -88,5 +91,6 @@ class AppConstants {
     'flv',
     'webm',
     'm4v',
+    'm3u8',
   ];
 }

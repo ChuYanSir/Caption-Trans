@@ -14,7 +14,9 @@ dependencies:
   intl: ^0.20.2
 
   # Whisper / Audio
-  ffmpeg_kit_flutter_new_min: ^3.1.0
+  # Pinned: 3.2+ ships Windows binaries that collide with the
+  # ffmpeg_kit_extended_flutter bundle (both install libffmpegkit.dll).
+  ffmpeg_kit_flutter_new_min: 3.1.0
   ffmpeg_kit_extended_flutter:
     git:
       url: https://github.com/cddqssc/ffmpeg-kit-extended.git

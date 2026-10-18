@@ -33,7 +33,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get clickToSelectVideo => '点击选择视频文件';
 
   @override
-  String get supportedFormats => '支持 MP4、MKV、AVI、MOV、WebM 等格式';
+  String get supportedFormats => '支持 MP4、MKV、AVI、MOV、WebM、M3U8（HLS）等格式';
 
   @override
   String get videoSelected => '已选择视频文件';
@@ -350,4 +350,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get releaseNotes => '更新说明';
+
+  @override
+  String get errorDetails => '错误详情';
+
+  @override
+  String get recentLogs => '最近的日志';
+
+  @override
+  String get copy => '复制';
+
+  @override
+  String get copiedToClipboard => '已复制到剪贴板';
+
+  @override
+  String get cliPathLabel => 'CLI 命令 / 路径';
+
+  @override
+  String get cliPathHint => '例如 claude 或 C:\\path\\to\\claude.cmd';
+
+  @override
+  String get apiKeyOptional => 'API Key（可选）';
 }

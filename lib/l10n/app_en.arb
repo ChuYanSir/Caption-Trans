@@ -8,7 +8,7 @@
   "error": "Error",
   "stepSelectVideo": "Select Video",
   "clickToSelectVideo": "Click to select a video file",
-  "supportedFormats": "Supports MP4, MKV, AVI, MOV, WebM and more",
+  "supportedFormats": "Supports MP4, MKV, AVI, MOV, WebM, M3U8 (HLS) and more",
   "videoSelected": "Video file selected",
   "changeFile": "Change file",
   "clear": "Clear",
@@ -177,5 +177,12 @@
     }
   },
   "updateCheckFailed": "Failed to check for updates.",
-  "releaseNotes": "Release notes"
+  "releaseNotes": "Release notes",
+  "errorDetails": "Error details",
+  "recentLogs": "Recent logs",
+  "copy": "Copy",
+  "copiedToClipboard": "Copied to clipboard",
+  "cliPathLabel": "CLI command / path",
+  "cliPathHint": "e.g. claude or C:\\path\\to\\claude.cmd",
+  "apiKeyOptional": "API key (optional)"
 }

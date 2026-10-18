@@ -5,8 +5,8 @@ import 'package:archive/archive_io.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
+import '../../core/app_paths.dart';
 import '../../models/whisper_download_source.dart';
 
 class WhisperXRuntimeInfo {
@@ -146,9 +146,9 @@ class WhisperXRuntime {
     }
 
     onProgress?.call(2);
-    final Directory supportDir = await getApplicationSupportDirectory();
+    final Directory applicationDataDir = await AppPaths.root();
     final Directory runtimeDir = Directory(
-      p.join(supportDir.path, _runtimeDirName),
+      p.join(applicationDataDir.path, _runtimeDirName),
     );
     await runtimeDir.create(recursive: true);
 
@@ -564,19 +564,17 @@ class WhisperXRuntime {
       return null;
     }
 
-    if (cudaVersion.compareTo(const _CudaVersion(12, 6)) >= 0) {
+    // whisperx 3.8.2 and pyannote.audio pin torch to 2.8.x, and PyTorch only
+    // publishes 2.8.0 for cu126 and newer channels (cu124 stops at 2.6.0,
+    // cu121 at 2.5.1, cu118 at 2.7.1). CUDA minor-version compatibility lets
+    // any CUDA 12.x driver load cu126 wheels, so cu126 is the lowest channel
+    // that can satisfy the pinned torch version.
+    if (cudaVersion.compareTo(const _CudaVersion(12, 1)) >= 0) {
       return 'cu126';
     }
-    if (cudaVersion.compareTo(const _CudaVersion(12, 4)) >= 0) {
-      return 'cu124';
-    }
-    if (cudaVersion.compareTo(const _CudaVersion(12, 1)) >= 0) {
-      return 'cu121';
-    }
-    if (cudaVersion.compareTo(const _CudaVersion(11, 8)) >= 0) {
-      return 'cu118';
-    }
 
+    // CUDA 11.x drivers cannot load cu126 wheels and no 2.8.x cu118 wheel
+    // exists, so fall back to the CPU runtime.
     return null;
   }
 
@@ -647,6 +645,10 @@ class WhisperXRuntime {
       'HF_HUB_CACHE': huggingFaceHubDir.path,
       'TORCH_HOME': torchDir.path,
       'XDG_CACHE_HOME': xdgDir.path,
+      // NLTK 3.10+ refuses fetches that go through a proxy unless this opt-in
+      // is set. WhisperX downloads its punkt_tab tokenizer resource lazily at
+      // alignment time, so without it alignment fails behind a proxy.
+      'NLTK_ALLOW_PROXIED_URLOPEN': '1',
     };
 
     final String? huggingFaceEndpoint = switch (_downloadSourceProfile) {

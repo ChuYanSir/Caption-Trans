@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import 'translation_failure.dart';
+import 'translation_prompt.dart';
 import 'translation_provider.dart';
 
 /// LLM implementation of [TranslationProvider] using the standard OpenAI API.
@@ -48,7 +48,7 @@ class LlmProvider implements TranslationProvider {
       throw StateError('API key not configured. Call validateApiKey first.');
     }
 
-    final prompt = _buildTranslationPrompt(
+    final prompt = buildTranslationPrompt(
       texts: texts,
       sourceLanguage: sourceLanguage,
       targetLanguage: targetLanguage,
@@ -69,7 +69,7 @@ class LlmProvider implements TranslationProvider {
 
     onProgress?.call(texts.length, texts.length);
 
-    return _parseTranslationResponse(
+    return parseTranslationResponse(
       response.text ?? '',
       texts.length,
       response.finishReason,
@@ -89,36 +89,14 @@ class LlmProvider implements TranslationProvider {
     }
     if (allTexts.isEmpty) return '';
 
-    final sampleSize = allTexts.length > 50 ? 50 : allTexts.length;
-    final step = allTexts.length ~/ sampleSize;
-    if (step == 0) return '';
+    final sampleTexts = sampleTextsForContext(allTexts);
+    if (sampleTexts.isEmpty) return '';
 
-    final sample = <String>[];
-    for (
-      var i = 0;
-      i < allTexts.length && sample.length < sampleSize;
-      i += step
-    ) {
-      sample.add(allTexts[i]);
-    }
-
-    final prompt =
-        '''
-You are analyzing a video transcript for translation preparation.
-
-Source language: $sourceLanguage
-Target language: $targetLanguage
-
-Here is a sample of the transcript:
-${sample.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n')}
-
-Please provide:
-1. A brief summary of the content topic
-2. Key terms and proper nouns that should be translated consistently
-3. The overall tone (formal/informal/technical)
-
-Keep your response concise (under 200 words).
-''';
+    final prompt = buildContextSummaryPrompt(
+      sampleTexts: sampleTexts,
+      sourceLanguage: sourceLanguage,
+      targetLanguage: targetLanguage,
+    );
 
     final response = await _createChatCompletion(
       apiKey: _apiKey!,
@@ -320,114 +298,6 @@ Keep your response concise (under 200 words).
     return 'Unknown error';
   }
 
-  String _buildTranslationPrompt({
-    required List<String> texts,
-    required String sourceLanguage,
-    required String targetLanguage,
-    List<String> contextBefore = const [],
-    List<String> contextAfter = const [],
-    Map<String, String> glossary = const {},
-  }) {
-    final buffer = StringBuffer();
-    buffer.writeln('You are a professional subtitle translator.');
-    buffer.writeln(
-      'Translate the following subtitle lines from $sourceLanguage to $targetLanguage.',
-    );
-    buffer.writeln();
-    buffer.writeln('RULES:');
-    buffer.writeln('1. Keep translations natural and conversational');
-    buffer.writeln('2. Maintain consistent terminology throughout');
-    buffer.writeln('3. Return EXACTLY ${texts.length} translated lines');
-    buffer.writeln(
-      '4. Each translated line should correspond to the same numbered input line',
-    );
-    buffer.writeln(
-      '5. Output ONLY the translations, one per line, numbered like: 1. translated text',
-    );
-    buffer.writeln(
-      '6. Do NOT translate proper nouns unless there is a widely used translation',
-    );
-    buffer.writeln();
-
-    if (glossary.isNotEmpty) {
-      buffer.writeln('GLOSSARY (use these translations consistently):');
-      glossary.forEach((source, target) {
-        buffer.writeln('  "$source" -> "$target"');
-      });
-      buffer.writeln();
-    }
-
-    if (contextBefore.isNotEmpty) {
-      buffer.writeln(
-        'PRECEDING CONTEXT (already translated, for reference only):',
-      );
-      for (final line in contextBefore) {
-        buffer.writeln('  - $line');
-      }
-      buffer.writeln();
-    }
-
-    buffer.writeln('LINES TO TRANSLATE:');
-    for (var i = 0; i < texts.length; i++) {
-      buffer.writeln('${i + 1}. ${texts[i]}');
-    }
-
-    if (contextAfter.isNotEmpty) {
-      buffer.writeln();
-      buffer.writeln(
-        'FOLLOWING CONTEXT (for reference only, do NOT translate):',
-      );
-      for (final line in contextAfter) {
-        buffer.writeln('  - $line');
-      }
-    }
-
-    return buffer.toString();
-  }
-
-  List<String> _parseTranslationResponse(
-    String response,
-    int expectedCount,
-    String? finishReason,
-  ) {
-    if (response.isEmpty) {
-      if (finishReason != null && finishReason.isNotEmpty) {
-        return List.filled(expectedCount, buildTranslationError(finishReason));
-      }
-      return List.filled(
-        expectedCount,
-        buildTranslationError(
-          'The output may contain sensitive terms. Please try switching to a different model. 翻译错误，可能包含敏感词，请尝试更换模型',
-        ),
-      );
-    }
-
-    final lines = response
-        .split('\n')
-        .map((l) => l.trim())
-        .where((l) => l.isNotEmpty)
-        .toList();
-
-    final results = <String>[];
-    for (final line in lines) {
-      final match = RegExp(r'^\d+[.:]\s*(.+)$').firstMatch(line);
-      if (match != null) {
-        results.add(match.group(1)!.trim());
-      }
-    }
-
-    if (results.length != expectedCount && lines.length == expectedCount) {
-      return lines;
-    }
-
-    while (results.length < expectedCount) {
-      results.add(buildTranslationError('Incomplete response'));
-    }
-
-    return results.length > expectedCount
-        ? results.sublist(0, expectedCount)
-        : results;
-  }
 }
 
 class _ChatCompletionResult {

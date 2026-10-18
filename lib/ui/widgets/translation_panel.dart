@@ -17,6 +17,7 @@ const Map<String, String> defaultLlmBaseUrls = {
   'Gemini (Google)': 'https://generativelanguage.googleapis.com/v1beta/openai',
   'Ollama': 'http://localhost:11434/v1',
   'SiliconFlow': 'https://api.siliconflow.cn/v1',
+  AppConstants.claudeCodeCliProvider: 'claude',
 };
 
 /// Panel for configuring and starting translation.
@@ -88,6 +89,11 @@ class TranslationPanel extends StatelessWidget {
               ? 'Gemini (Google)'
               : defaultLlmBaseUrls.keys.first);
 
+    // The local Claude Code CLI authenticates itself, so no API key is needed
+    // and the "Base URL" field holds the CLI command or path instead.
+    final bool isLocalCli =
+        currentProviderValue == AppConstants.claudeCodeCliProvider;
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -132,7 +138,7 @@ class TranslationPanel extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              'Base URL',
+              isLocalCli ? l10n.cliPathLabel : 'Base URL',
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.white.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
@@ -140,10 +146,12 @@ class TranslationPanel extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
-              decoration: const InputDecoration(
-                hintText: 'e.g. https://api.openai.com/v1',
+              decoration: InputDecoration(
+                hintText: isLocalCli
+                    ? l10n.cliPathHint
+                    : 'e.g. https://api.openai.com/v1',
                 isDense: true,
-                prefixIcon: Icon(Icons.link_rounded, size: 18),
+                prefixIcon: const Icon(Icons.link_rounded, size: 18),
               ),
               onChanged: onLlmBaseUrlChanged,
               controller: TextEditingController(
@@ -152,7 +160,7 @@ class TranslationPanel extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              l10n.geminiApiKey,
+              isLocalCli ? l10n.apiKeyOptional : l10n.geminiApiKey,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: Colors.white.withValues(alpha: 0.6),
                 fontWeight: FontWeight.w500,
@@ -178,7 +186,7 @@ class TranslationPanel extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 FilledButton(
-                  onPressed: _isTranslating || apiKey.isEmpty
+                  onPressed: _isTranslating || (!isLocalCli && apiKey.isEmpty)
                       ? null
                       : onCheckModels,
                   style: FilledButton.styleFrom(

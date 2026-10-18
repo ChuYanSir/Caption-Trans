@@ -128,6 +128,11 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  /// The local Claude Code CLI provider authenticates itself, so an API key
+  /// must not be required for it.
+  bool get _isLocalCliProvider =>
+      _llmProvider == AppConstants.claudeCodeCliProvider;
+
   bool _isModelFetchFailed(List<String> models) {
     if (models.isEmpty) return true;
     final first = models.first.toLowerCase();
@@ -156,7 +161,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _saveProviderCredentialIfNeeded() async {
-    if (_llmProvider.isEmpty || _llmBaseUrl.isEmpty || _apiKey.isEmpty) return;
+    if (_llmProvider.isEmpty || _llmBaseUrl.isEmpty) return;
+    if (_apiKey.isEmpty && !_isLocalCliProvider) return;
 
     final credential = ProviderCredential(
       baseUrl: _llmBaseUrl.trim(),
@@ -175,7 +181,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _fetchModels({bool saveProviderCredential = false}) async {
-    if (_apiKey.isEmpty) return;
+    if (_apiKey.isEmpty && !_isLocalCliProvider) return;
 
     setState(() => _isLoadingModels = true);
     try {

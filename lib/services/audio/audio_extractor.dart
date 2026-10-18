@@ -1,6 +1,8 @@
 import 'dart:io';
-import 'package:path_provider/path_provider.dart';
+
 import 'package:path/path.dart' as p;
+
+import '../../core/app_paths.dart';
 
 /// Service for extracting audio from video files.
 ///
@@ -10,7 +12,7 @@ class AudioExtractor {
   ///
   /// Returns the path to the extracted WAV file.
   Future<String> extractAudio(String videoPath) async {
-    final tempDir = await getTemporaryDirectory();
+    final tempDir = await AppPaths.temp();
     final outputFileName = '${p.basenameWithoutExtension(videoPath)}_audio.wav';
     final outputPath = p.join(tempDir.path, 'caption_trans', outputFileName);
 
@@ -121,7 +123,7 @@ class AudioExtractor {
   /// Clean up temporary audio files.
   Future<void> cleanup() async {
     try {
-      final tempDir = await getTemporaryDirectory();
+      final tempDir = await AppPaths.temp();
       final audioDir = Directory(p.join(tempDir.path, 'caption_trans'));
       if (await audioDir.exists()) {
         await audioDir.delete(recursive: true);

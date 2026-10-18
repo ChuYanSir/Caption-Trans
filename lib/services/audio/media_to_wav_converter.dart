@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:caption_trans/converter/ffmpeg_macos.dart';
 import 'package:caption_trans/converter/ffmpeg_windows.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+
+import '../../core/app_paths.dart';
 
 /// Converts media input into WhisperX-ready WAV audio.
 class MediaToWavConverter {
@@ -15,7 +16,7 @@ class MediaToWavConverter {
       return inputPath;
     }
 
-    final tempDir = await getTemporaryDirectory();
+    final tempDir = await AppPaths.temp();
     final outputDir = Directory(
       p.join(tempDir.path, 'caption_trans', 'whisperx'),
     );

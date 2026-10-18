@@ -33,7 +33,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get clickToSelectVideo => 'Click to select a video file';
 
   @override
-  String get supportedFormats => 'Supports MP4, MKV, AVI, MOV, WebM and more';
+  String get supportedFormats =>
+      'Supports MP4, MKV, AVI, MOV, WebM, M3U8 (HLS) and more';
 
   @override
   String get videoSelected => 'Video file selected';
@@ -360,4 +361,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get releaseNotes => 'Release notes';
+
+  @override
+  String get errorDetails => 'Error details';
+
+  @override
+  String get recentLogs => 'Recent logs';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get copiedToClipboard => 'Copied to clipboard';
+
+  @override
+  String get cliPathLabel => 'CLI command / path';
+
+  @override
+  String get cliPathHint => 'e.g. claude or C:\\path\\to\\claude.cmd';
+
+  @override
+  String get apiKeyOptional => 'API key (optional)';
 }

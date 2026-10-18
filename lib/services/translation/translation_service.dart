@@ -1,6 +1,8 @@
 import 'dart:async';
+import '../../core/constants.dart';
 import '../../models/subtitle_segment.dart';
 import '../../models/translation_config.dart';
+import 'claude_code_provider.dart';
 import 'translation_provider.dart';
 import 'translation_failure.dart';
 import 'llm_provider.dart';
@@ -39,6 +41,9 @@ class TranslationService {
   TranslationProvider? get currentProvider => _provider;
 
   static TranslationProvider _defaultProviderFactory(TranslationConfig config) {
+    if (config.providerId == AppConstants.claudeCodeCliProvider) {
+      return ClaudeCodeProvider(command: config.baseUrl, model: config.model);
+    }
     return LlmProvider(providerId: config.providerId);
   }
 
