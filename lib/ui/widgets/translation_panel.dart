@@ -413,9 +413,13 @@ class TranslationPanel extends StatelessWidget {
   bool get _hasRetryableState =>
       _hasSuccessfulTranslation || _hasFailures || _hasUntranslatedSegments;
 
+  /// The local Claude Code CLI authenticates itself, so an empty API key must
+  /// not block translation.
+  bool get _isLocalCli => llmProvider == AppConstants.claudeCodeCliProvider;
+
   bool get _canStart =>
       transcriptionState is TranscriptionComplete &&
-      apiKey.isNotEmpty &&
+      (_isLocalCli || apiKey.isNotEmpty) &&
       availableModels.isNotEmpty &&
       translationState is! TranslationInProgress;
 

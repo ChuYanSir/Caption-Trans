@@ -6,6 +6,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../services/settings_service.dart';
+import '../services/translation/claude_code_provider.dart';
 import '../services/translation/translation_failure.dart';
 import '../services/translation/translation_service.dart';
 import '../blocs/transcription/transcription_bloc.dart';
@@ -98,6 +99,14 @@ class _HomePageState extends State<HomePage> {
       _targetLanguage = widget.settingsService.targetLanguage;
       _bilingual = widget.settingsService.bilingual;
       _batchSize = widget.settingsService.batchSize;
+      // The local CLI exposes a fixed set of model aliases and needs no API
+      // key, so restore its models without any network round trip.
+      if (provider == AppConstants.claudeCodeCliProvider) {
+        _availableModels = kClaudeCodeModels;
+        if (!_availableModels.contains(_targetModel)) {
+          _targetModel = kClaudeCodeDefaultModel;
+        }
+      }
     });
 
     if (_apiKey.isNotEmpty) {
@@ -146,13 +155,16 @@ class _HomePageState extends State<HomePage> {
     final baseUrl =
         savedCredential?.baseUrl ?? (defaultLlmBaseUrls[provider] ?? '');
     final apiKey = savedCredential?.apiKey ?? '';
+    final bool isLocalCli = provider == AppConstants.claudeCodeCliProvider;
 
     setState(() {
       _llmProvider = provider;
       _llmBaseUrl = baseUrl;
       _apiKey = apiKey;
-      _targetModel = '';
-      _availableModels = [];
+      // Pre-fill the fixed model aliases so the start button becomes usable
+      // without pressing "Detect" first.
+      _availableModels = isLocalCli ? kClaudeCodeModels : <String>[];
+      _targetModel = isLocalCli ? kClaudeCodeDefaultModel : '';
     });
 
     widget.settingsService.setLlmProvider(provider);

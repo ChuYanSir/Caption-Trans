@@ -9,6 +9,15 @@ import 'translation_provider.dart';
 /// configured with".
 const String kClaudeCodeDefaultModel = '(default)';
 
+/// Model aliases offered in the app's model dropdown. Claude Code resolves
+/// them itself; [kClaudeCodeDefaultModel] means "do not pass --model".
+const List<String> kClaudeCodeModels = <String>[
+  kClaudeCodeDefaultModel,
+  'sonnet',
+  'opus',
+  'haiku',
+];
+
 /// Translation provider that shells out to a locally installed Claude Code
 /// CLI instead of calling an HTTP API.
 ///
@@ -104,12 +113,7 @@ class ClaudeCodeProvider implements TranslationProvider {
   /// app's model dropdown.
   @override
   Future<List<String>> listModels(String apiKey, {String? baseUrl}) async {
-    return const <String>[
-      kClaudeCodeDefaultModel,
-      'sonnet',
-      'opus',
-      'haiku',
-    ];
+    return kClaudeCodeModels;
   }
 
   @override
